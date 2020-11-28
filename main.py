@@ -2,7 +2,7 @@ import sys
 from db import Models
 from PyQt5 import uic, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow
-from modals import AddTemplateDialog
+from modals.template import AddTemplateDialog
 
 
 class Main(QMainWindow):
