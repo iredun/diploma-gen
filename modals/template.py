@@ -1,12 +1,16 @@
+import json
 import random
+import shutil
+import uuid
 
+from common import const
 from .item_config import ItemConfigDialog
 
 from PyQt5 import uic, QtCore  # Импортируем uic
-from PyQt5.QtCore import Qt, QRectF
-from PyQt5.QtGui import QPixmap, QPen, QColor, QMouseEvent, QKeyEvent, QFont
+from PyQt5.QtCore import Qt, QRectF, QVariant
+from PyQt5.QtGui import QPixmap, QPen, QColor, QMouseEvent, QKeyEvent, QFont, QCloseEvent
 from PyQt5.QtWidgets import QGraphicsScene, QFileDialog, QGraphicsPixmapItem, QGraphicsRectItem, \
-    QGraphicsItem, QGraphicsView, QGraphicsSceneMouseEvent, QMainWindow
+    QGraphicsItem, QGraphicsView, QGraphicsSceneMouseEvent, QMainWindow, QMessageBox
 
 
 class GraphicsRectItem(QGraphicsRectItem):
@@ -15,7 +19,7 @@ class GraphicsRectItem(QGraphicsRectItem):
 
         self.font = QFont()
 
-        print(self.toolTip())
+        self.main_view: QGraphicsView = QGraphicsView()
 
         self.setCursor(Qt.PointingHandCursor)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
@@ -23,7 +27,6 @@ class GraphicsRectItem(QGraphicsRectItem):
         self.setFlag(QGraphicsItem.ItemIsFocusable, True)
 
         self.item_config_window = ItemConfigDialog()
-        self.item_config_window.closeEvent = self.get_config
 
     def mouseDoubleClickEvent(self, event: QGraphicsSceneMouseEvent):
         self.item_config()
@@ -32,10 +35,8 @@ class GraphicsRectItem(QGraphicsRectItem):
     @QtCore.pyqtSlot()
     def item_config(self):
         self.item_config_window.item = self
+        self.item_config_window.main_view = self.main_view
         self.item_config_window.show()
-
-    def get_config(self, event):
-        print("close", event)
 
 
 class GraphicsView(QGraphicsView):
@@ -90,6 +91,12 @@ class GraphicsView(QGraphicsView):
                            random.randint(50, 200))
             self.pen.setColor(color)
             rect_item.setPen(self.pen)
+            rect_item.main_view = self
+
+            rect_item.setData(const.ITEM_DATA_KEY_FONT, 'Arial')
+            rect_item.setData(const.ITEM_DATA_KEY_FONT_SIZE, 12)
+            rect_item.setData(const.ITEM_DATA_KEY_FONT_ALIGN, 'center')
+            rect_item.setData(const.ITEM_DATA_KEY_FONT_COLOR, (0, 0, 0))
 
             self.scene().addItem(rect_item)
             rect_item.setToolTip(f'Поле_{len(self.scene().items()) - 1}')
@@ -107,15 +114,17 @@ class GraphicsView(QGraphicsView):
             self.start_coords = tuple()
             self.end_coords = tuple()
             self.current_item = None
+            self.parent.not_saved = True
 
         super(GraphicsView, self).mouseReleaseEvent(event)
 
 
 class AddTemplateDialog(QMainWindow):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, parent):
+        super().__init__()
         uic.loadUi('designs/add_template.ui', self)  # Загружаем дизайн
 
+        self.parent = parent
         self.bg_item = None
         self.bg = None
 
@@ -136,11 +145,13 @@ class AddTemplateDialog(QMainWindow):
 
         self.edit_mode = False
 
+        self.not_saved = False
+
     def add_bg(self):
         self.scene.clear()
-        self.bg = \
-        QFileDialog.getOpenFileName(self, 'Открыть файл', filter="Изображения (*.png *.jpg)")[0]
+        self.bg = QFileDialog.getOpenFileName(self, 'Открыть файл', filter="Изображения (*.png *.jpg)")[0]
         if self.bg:
+            self.not_saved = True
             self.groupBoxMainInfo.setEnabled(True)
             img = QPixmap(self.bg)
             w, h = img.width(), img.height()
@@ -154,10 +165,46 @@ class AddTemplateDialog(QMainWindow):
             self.groupBoxMainInfo.setEnabled(False)
 
     def save(self):
-        for item in self.scene.items():
-            pos = item.mapFromItem(item)
-            x, y = pos.x(), pos.y()
-            print(item.toolTip(), x, y)
+        template_name = self.editName.text()
+        if template_name:
+            bg = f'./templates/{uuid.uuid4()}.template'
+            shutil.copy2(self.bg, bg)
+            data = {
+                'items': [],
+                'bg': bg,
+            }
+            for item in self.scene.items():
+                if item.toolTip():
+                    pos_from = self.graphicsView.mapFromScene(item.sceneBoundingRect())
+                    pos = self.graphicsView.mapToScene(pos_from)
+                    rect = pos.boundingRect()
+                    x, y = rect.x(), rect.y()
+                    data['items'].append({
+                        'name': item.toolTip(),
+                        'x': x,
+                        'y': y,
+                        'w': rect.width(),
+                        'h': rect.height(),
+                        'params': {
+                            const.ITEM_DATA_KEY_FONT: item.data(const.ITEM_DATA_KEY_FONT),
+                            const.ITEM_DATA_KEY_FONT_SIZE: item.data(const.ITEM_DATA_KEY_FONT_SIZE),
+                            const.ITEM_DATA_KEY_FONT_COLOR: item.data(const.ITEM_DATA_KEY_FONT_COLOR),
+                            const.ITEM_DATA_KEY_FONT_ALIGN: item.data(const.ITEM_DATA_KEY_FONT_ALIGN),
+                        }
+                    })
+            rec = self.parent.models.template_model.record()
+            rec.setValue('name', QVariant(template_name))
+            rec.setValue('settings', QVariant(json.dumps(data)))
+            if self.parent.models.template_model.insertRecord(-1, rec):
+                self.not_saved = False
+                self.close()
+            else:
+                msg = QMessageBox(QMessageBox.Critical, "Ошибка сохранения", 'Что-то пошло не так')
+                msg.exec_()
+
+        else:
+            msg = QMessageBox(QMessageBox.Critical, "Ошибка сохранения", 'Введите название шаблона')
+            msg.exec_()
 
     def is_edit_mode(self):
         result = self.edit_mode and self.bg
@@ -166,3 +213,17 @@ class AddTemplateDialog(QMainWindow):
         else:
             self.statusbar.showMessage('Режим работы: Редактирование')
         return result
+
+    def closeEvent(self, event: QCloseEvent) -> None:
+        if self.not_saved:
+            ret = QMessageBox.question(self, 'Закрыть',
+                                       "У Вас есть несохраненные изменения. Вы действительно хотите закрыть редактор?",
+                                       QMessageBox.Ok | QMessageBox.Cancel)
+
+            if ret == QMessageBox.Ok:
+                event.accept()
+            else:
+                event.ignore()
+        else:
+            event.accept()
+        self.parent.reload_templates()
