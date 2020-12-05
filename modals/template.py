@@ -154,10 +154,10 @@ class AddTemplateDialog(QMainWindow):
             self.not_saved = True
             self.groupBoxMainInfo.setEnabled(True)
             img = QPixmap(self.bg)
-            w, h = img.width(), img.height()
+            # w, h = img.width(), img.height()
             self.bg_item = QGraphicsPixmapItem(img)
             self.scene.addItem(self.bg_item)
-            self.graphicsView.fitInView(QRectF(0, 0, w, h), Qt.KeepAspectRatio)
+            # self.graphicsView.fitInView(QRectF(0, 0, w, h), Qt.KeepAspectRatio)
             self.scene.update()
             self.graphicsView.setFocus()
             self.is_edit_mode()

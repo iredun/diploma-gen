@@ -4,6 +4,7 @@ from db import Models
 from PyQt5 import uic, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from modals.template import AddTemplateDialog
+from modals.export import ExportDialog
 
 
 class Main(QMainWindow):
@@ -17,8 +18,10 @@ class Main(QMainWindow):
         self.tableTemplates.hideColumn(2)
 
         self.addTemplate.clicked.connect(self.add_template)
+        self.useTemplate.clicked.connect(self.export_template)
 
         self.add_template_window = None
+        self.export_template_window = None
 
         self.tableTemplates.selectionModel().selectionChanged.connect(self.change_item_selected)
 
@@ -26,6 +29,11 @@ class Main(QMainWindow):
     def add_template(self):
         self.add_template_window = AddTemplateDialog(self)
         self.add_template_window.show()
+
+    @QtCore.pyqtSlot()
+    def export_template(self):
+        self.export_template_window = ExportDialog(self)
+        self.export_template_window.show()
 
     def reload_templates(self):
         self.models.template_model.select()
