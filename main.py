@@ -1,3 +1,4 @@
+import os
 import sys
 
 from db import Models
@@ -5,6 +6,8 @@ from PyQt5 import uic, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from modals.template import AddTemplateDialog
 from modals.export import ExportDialog
+
+# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
 class Main(QMainWindow):
@@ -20,6 +23,8 @@ class Main(QMainWindow):
         self.addTemplate.clicked.connect(self.add_template)
         self.useTemplate.clicked.connect(self.export_template)
 
+        self.selected_template_settings = None
+
         self.add_template_window = None
         self.export_template_window = None
 
@@ -32,7 +37,7 @@ class Main(QMainWindow):
 
     @QtCore.pyqtSlot()
     def export_template(self):
-        self.export_template_window = ExportDialog(self)
+        self.export_template_window = ExportDialog(self, self.selected_template_settings)
         self.export_template_window.show()
 
     def reload_templates(self):
@@ -44,6 +49,7 @@ class Main(QMainWindow):
             for index in rows:
                 if index.row() >= 0:
                     self.useTemplate.setEnabled(True)
+                    self.selected_template_settings = index.model().record(index.row()).value('settings')
                 else:
                     self.useTemplate.setEnabled(False)
         else:
@@ -51,6 +57,7 @@ class Main(QMainWindow):
 
 
 def except_hook(cls, exception, traceback):
+    print(cls, exception, traceback)
     sys.__excepthook__(cls, exception, traceback)
 
 

@@ -52,7 +52,7 @@ class ItemConfigDialog(QMainWindow):
             if font_size:
                 font.setPointSize(font_size)
             else:
-                font.setPointSize(font_size)
+                font.setPointSize(12)
             font_color = self.item.data(const.ITEM_DATA_KEY_FONT_COLOR)
             if font_color:
                 self.font_color.setRgb(*font_color)

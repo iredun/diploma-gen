@@ -1,4 +1,13 @@
-ITEM_DATA_KEY_FONT = 1
-ITEM_DATA_KEY_FONT_SIZE = 2
-ITEM_DATA_KEY_FONT_ALIGN = 3
-ITEM_DATA_KEY_FONT_COLOR = 4
+ITEM_DATA_KEY_FONT = '1'
+ITEM_DATA_KEY_FONT_SIZE = '2'
+ITEM_DATA_KEY_FONT_ALIGN = '3'
+ITEM_DATA_KEY_FONT_COLOR = '4'
+
+DIRS_HTML = """
+<p>Для составления сложного пути выгрузки, в случаи когда необходимо файлы разложить по определнным папкам.</p>
+<p>Можно воспользоваться следующими перменными:</p>
+"""
+
+FILE_MASK_HTML = """
+<p>Для составления сложного имени файла, можно воспользоваться следующими перменными:</p>
+"""
