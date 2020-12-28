@@ -45,19 +45,19 @@ class ItemConfigDialog(QMainWindow):
         self.text = QGraphicsTextItem()
         self.name.setText(self.item.toolTip())
         font = QFont()
-        font_name = self.item.data(const.ITEM_DATA_KEY_FONT)
+        font_name = self.item.data(int(const.ITEM_DATA_KEY_FONT))
         if font_name:
             font.fromString(font_name)
-            font_size = self.item.data(const.ITEM_DATA_KEY_FONT_SIZE)
+            font_size = self.item.data(int(const.ITEM_DATA_KEY_FONT_SIZE))
             if font_size:
                 font.setPointSize(font_size)
             else:
                 font.setPointSize(12)
-            font_color = self.item.data(const.ITEM_DATA_KEY_FONT_COLOR)
+            font_color = self.item.data(int(const.ITEM_DATA_KEY_FONT_COLOR))
             if font_color:
                 self.font_color.setRgb(*font_color)
             self.text.setFont(font)
-        self.text_align = self.item.data(const.ITEM_DATA_KEY_FONT_ALIGN)
+        self.text_align = self.item.data(int(const.ITEM_DATA_KEY_FONT_ALIGN))
 
         self.render_text()
         self.render_item()
@@ -101,10 +101,10 @@ class ItemConfigDialog(QMainWindow):
         self.scene.update()
 
     def accepted(self):
-        self.item.setData(const.ITEM_DATA_KEY_FONT, self.text.font().toString().split(',')[0])
-        self.item.setData(const.ITEM_DATA_KEY_FONT_SIZE, self.text.font().pointSize())
-        self.item.setData(const.ITEM_DATA_KEY_FONT_ALIGN, self.text_align)
-        self.item.setData(const.ITEM_DATA_KEY_FONT_COLOR, self.font_color.getRgb())
+        self.item.setData(int(const.ITEM_DATA_KEY_FONT), self.text.font().toString().split(',')[0])
+        self.item.setData(int(const.ITEM_DATA_KEY_FONT_SIZE), self.text.font().pointSize())
+        self.item.setData(int(const.ITEM_DATA_KEY_FONT_ALIGN), self.text_align)
+        self.item.setData(int(const.ITEM_DATA_KEY_FONT_COLOR), self.font_color.getRgb())
         self.item.setToolTip(self.name.text())
         self.item.scene().update()
         self.close()

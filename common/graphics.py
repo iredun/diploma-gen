@@ -2,7 +2,7 @@ import random
 from . import const
 from modals.item_config import ItemConfigDialog
 from PyQt5 import QtCore  # Импортируем uic
-from PyQt5.QtCore import Qt, QRectF, QVariant
+from PyQt5.QtCore import Qt, QRectF
 from PyQt5.QtGui import QPen, QColor, QMouseEvent, QKeyEvent, QFont
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsItem, QGraphicsView, QGraphicsSceneMouseEvent
 
@@ -87,10 +87,10 @@ class GraphicsView(QGraphicsView):
             rect_item.setPen(self.pen)
             rect_item.main_view = self
 
-            rect_item.setData(const.ITEM_DATA_KEY_FONT, 'Arial')
-            rect_item.setData(const.ITEM_DATA_KEY_FONT_SIZE, 12)
-            rect_item.setData(const.ITEM_DATA_KEY_FONT_ALIGN, 'center')
-            rect_item.setData(const.ITEM_DATA_KEY_FONT_COLOR, (0, 0, 0))
+            rect_item.setData(int(const.ITEM_DATA_KEY_FONT), 'Arial')
+            rect_item.setData(int(const.ITEM_DATA_KEY_FONT_SIZE), 12)
+            rect_item.setData(int(const.ITEM_DATA_KEY_FONT_ALIGN), 'center')
+            rect_item.setData(int(const.ITEM_DATA_KEY_FONT_COLOR), (0, 0, 0))
 
             self.scene().addItem(rect_item)
             rect_item.setToolTip(f'Поле_{len(self.scene().items()) - 1}')
@@ -99,6 +99,24 @@ class GraphicsView(QGraphicsView):
             self.scene().update()
 
         super(GraphicsView, self).mousePressEvent(event)
+
+    def add_custom_item(self, start_coords: tuple, rect: tuple, init_params: dict = dict):
+        rect_item = GraphicsRectItem(QRectF(int(start_coords[0]), int(start_coords[1]), rect[0], rect[1]))
+        color = QColor(random.randint(0, 180), random.randint(100, 255), random.randint(50, 200))
+
+        self.pen.setColor(color)
+        rect_item.setPen(self.pen)
+        rect_item.main_view = self
+
+        keys = [const.ITEM_DATA_KEY_FONT, const.ITEM_DATA_KEY_FONT_SIZE, const.ITEM_DATA_KEY_FONT_ALIGN,
+                const.ITEM_DATA_KEY_FONT_COLOR]
+
+        for key in keys:
+            rect_item.setData(int(key), init_params['params'][key])
+
+        self.scene().addItem(rect_item)
+        rect_item.setToolTip(init_params['name'])
+        self.scene().update()
 
     def mouseReleaseEvent(self, event: QMouseEvent):
         if self.parent.is_edit_mode():

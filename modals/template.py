@@ -20,6 +20,7 @@ class AddTemplateDialog(QMainWindow):
         self.parent = parent
         self.bg_item = None
         self.bg = None
+        self.template = None
 
         self.buttonAddBg.clicked.connect(self.add_bg)
 
@@ -40,11 +41,9 @@ class AddTemplateDialog(QMainWindow):
 
         self.not_saved = False
 
-    def add_bg(self):
-        self.scene.clear()
-        self.bg = QFileDialog.getOpenFileName(self, 'Открыть файл', filter="Изображения (*.png *.jpg)")[0]
+    def load_bg(self):
         if self.bg:
-            self.not_saved = True
+            self.scene.clear()
             self.groupBoxMainInfo.setEnabled(True)
             img = QPixmap(self.bg)
             self.bg_item = QGraphicsPixmapItem(img)
@@ -54,6 +53,25 @@ class AddTemplateDialog(QMainWindow):
             self.is_edit_mode()
         else:
             self.groupBoxMainInfo.setEnabled(False)
+
+    def add_bg(self):
+        self.bg = QFileDialog.getOpenFileName(self, 'Открыть файл', filter="Изображения (*.png *.jpg)")[0]
+        if self.bg:
+            self.not_saved = True
+            self.load_bg()
+
+    def load_template(self, template: dict):
+        template['settings'] = json.loads(template['settings'])
+        self.bg = template['settings']['bg']
+        self.editName.setText(template['name'])
+        self.load_bg()
+        for item in template['settings']['items']:
+            self.graphicsView.add_custom_item(
+                (item['x'], item['y']),
+                (item['w'], item['h']),
+                item
+            )
+        self.template = template
 
     def save(self):
         template_name = self.editName.text()
@@ -69,29 +87,42 @@ class AddTemplateDialog(QMainWindow):
                     pos_from = self.graphicsView.mapFromScene(item.sceneBoundingRect())
                     pos = self.graphicsView.mapToScene(pos_from)
                     rect = pos.boundingRect()
-                    x, y = rect.x(), rect.y()
                     data['items'].append({
                         'name': item.toolTip(),
-                        'x': x,
-                        'y': y,
-                        'w': rect.width(),
-                        'h': rect.height(),
+                        'x': rect.x() + 2,
+                        'y': rect.y() + 2,
+                        'w': rect.width() - 5,
+                        'h': rect.height() - 5,
                         'params': {
-                            const.ITEM_DATA_KEY_FONT: item.data(const.ITEM_DATA_KEY_FONT),
-                            const.ITEM_DATA_KEY_FONT_SIZE: item.data(const.ITEM_DATA_KEY_FONT_SIZE),
-                            const.ITEM_DATA_KEY_FONT_COLOR: item.data(const.ITEM_DATA_KEY_FONT_COLOR),
-                            const.ITEM_DATA_KEY_FONT_ALIGN: item.data(const.ITEM_DATA_KEY_FONT_ALIGN),
+                            const.ITEM_DATA_KEY_FONT: item.data(int(const.ITEM_DATA_KEY_FONT)),
+                            const.ITEM_DATA_KEY_FONT_SIZE: item.data(int(const.ITEM_DATA_KEY_FONT_SIZE)),
+                            const.ITEM_DATA_KEY_FONT_COLOR: item.data(int(const.ITEM_DATA_KEY_FONT_COLOR)),
+                            const.ITEM_DATA_KEY_FONT_ALIGN: item.data(int(const.ITEM_DATA_KEY_FONT_ALIGN)),
                         }
                     })
-            rec = self.parent.models.template_model.record()
-            rec.setValue('name', QVariant(template_name))
-            rec.setValue('settings', QVariant(json.dumps(data)))
-            if self.parent.models.template_model.insertRecord(-1, rec):
+
+            rec_name = QVariant(template_name)
+            rec_settings = QVariant(json.dumps(data))
+
+            if self.template:
+                rec = self.parent.models.template_model.record(self.template['index'])
+            else:
+                rec = self.parent.models.template_model.record()
+
+            rec.setValue('name', rec_name)
+            rec.setValue('settings', rec_settings)
+
+            if self.template:
+                self.parent.models.template_model.updateRowInTable(self.template['index'], rec)
                 self.not_saved = False
                 self.close()
             else:
-                msg = QMessageBox(QMessageBox.Critical, "Ошибка сохранения", 'Что-то пошло не так')
-                msg.exec_()
+                if self.parent.models.template_model.insertRecord(-1, rec):
+                    self.not_saved = False
+                    self.close()
+                else:
+                    msg = QMessageBox(QMessageBox.Critical, "Ошибка сохранения", 'Что-то пошло не так')
+                    msg.exec_()
 
         else:
             msg = QMessageBox(QMessageBox.Critical, "Ошибка сохранения", 'Введите название шаблона')
@@ -118,3 +149,5 @@ class AddTemplateDialog(QMainWindow):
         else:
             event.accept()
         self.parent.reload_templates()
+        self.parent.useTemplate.setEnabled(False)
+        self.parent.editTemplate.setEnabled(False)

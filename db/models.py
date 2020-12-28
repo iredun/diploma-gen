@@ -1,4 +1,5 @@
 from PyQt5 import QtSql, QtCore
+
 from .db import init_db
 
 
