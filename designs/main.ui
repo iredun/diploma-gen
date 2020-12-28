@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Генератор дипломов</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="res/res.qrc">
+    <normaloff>:/Icons/icon.png</normaloff>:/Icons/icon.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <property name="leftMargin">
@@ -28,7 +32,7 @@
      <number>8</number>
     </property>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0">
       <property name="sizeConstraint">
        <enum>QLayout::SetDefaultConstraint</enum>
       </property>
@@ -67,28 +71,46 @@
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QPushButton" name="useTemplate">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Использовать шаблон</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="editTemplate">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Изменить шаблон</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QPushButton" name="deleteTemplate">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Удалить шаблон</string>
+        </property>
+        <property name="icon">
+         <iconset resource="res/res.qrc">
+          <normaloff>:/Icons/delete-file.png</normaloff>:/Icons/delete-file.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="editTemplate">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Изменить шаблон</string>
+        </property>
+        <property name="icon">
+         <iconset resource="res/res.qrc">
+          <normaloff>:/Icons/edit-file.png</normaloff>:/Icons/edit-file.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="useTemplate">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Использовать шаблон</string>
+        </property>
+        <property name="icon">
+         <iconset resource="res/res.qrc">
+          <normaloff>:/Icons/use.png</normaloff>:/Icons/use.png</iconset>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>

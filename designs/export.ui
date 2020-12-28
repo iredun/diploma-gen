@@ -16,6 +16,10 @@
   <property name="windowTitle">
    <string>Генерация</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="res/res.qrc">
+    <normaloff>:/Icons/icon.png</normaloff>:/Icons/icon.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <property name="leftMargin">
@@ -47,6 +51,10 @@
             <widget class="QPushButton" name="openFileBtn">
              <property name="text">
               <string>Выбрать файл (.csv)</string>
+             </property>
+             <property name="icon">
+              <iconset resource="res/res.qrc">
+               <normaloff>:/Icons/text-file.png</normaloff>:/Icons/text-file.png</iconset>
              </property>
             </widget>
            </item>
@@ -277,6 +285,10 @@ p, li { white-space: pre-wrap; }
           <property name="text">
            <string>Експорт</string>
           </property>
+          <property name="icon">
+           <iconset resource="res/res.qrc">
+            <normaloff>:/Icons/use.png</normaloff>:/Icons/use.png</iconset>
+          </property>
          </widget>
         </item>
         <item>
@@ -318,6 +330,8 @@ p, li { white-space: pre-wrap; }
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="res/res.qrc"/>
+ </resources>
  <connections/>
 </ui>

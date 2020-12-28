@@ -1,16 +1,19 @@
+import json
+import os
 import sys
 
 from db import Models
-from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QMainWindow
+from designs.main import Ui_MainWindow
 from modals.template import AddTemplateDialog
 from modals.export import ExportDialog
+from designs.res import res
 
 
-class Main(QMainWindow):
+class Main(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('designs/main.ui', self)  # Загружаем дизайн
+        self.setupUi(self)
 
         self.models = Models(self)
 
@@ -20,6 +23,7 @@ class Main(QMainWindow):
         self.addTemplate.clicked.connect(self.add_template)
         self.useTemplate.clicked.connect(self.export_template)
         self.editTemplate.clicked.connect(self.edit_template)
+        self.deleteTemplate.clicked.connect(self.delete_template)
 
         self.selected_template_settings = None
 
@@ -31,6 +35,15 @@ class Main(QMainWindow):
     def add_template(self):
         self.add_template_window = AddTemplateDialog(self)
         self.add_template_window.show()
+
+    def delete_template(self):
+        if self.models.template_model.deleteRowFromTable(self.selected_template_settings['index']):
+            settings = json.loads(self.selected_template_settings['settings'])
+            os.remove(settings['bg'])
+            self.reload_templates()
+            self.useTemplate.setEnabled(False)
+            self.editTemplate.setEnabled(False)
+            self.deleteTemplate.setEnabled(False)
 
     def edit_template(self):
         self.add_template_window = AddTemplateDialog(self)
@@ -51,6 +64,7 @@ class Main(QMainWindow):
                 if index.row() >= 0:
                     self.useTemplate.setEnabled(True)
                     self.editTemplate.setEnabled(True)
+                    self.deleteTemplate.setEnabled(True)
                     self.selected_template_settings = {
                         'index': index.row(),
                         'name': index.model().record(index.row()).value('name'),
@@ -59,9 +73,11 @@ class Main(QMainWindow):
                 else:
                     self.useTemplate.setEnabled(False)
                     self.editTemplate.setEnabled(False)
+                    self.deleteTemplate.setEnabled(False)
         else:
             self.useTemplate.setEnabled(False)
             self.editTemplate.setEnabled(False)
+            self.deleteTemplate.setEnabled(False)
 
 
 def except_hook(cls, exception, traceback):

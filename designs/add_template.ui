@@ -14,7 +14,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Шаблон</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="res/res.qrc">
+    <normaloff>:/Icons/icon.png</normaloff>:/Icons/icon.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -59,6 +63,10 @@
            <property name="text">
             <string>Сохранить шаблон</string>
            </property>
+           <property name="icon">
+            <iconset resource="res/res.qrc">
+             <normaloff>:/Icons/use.png</normaloff>:/Icons/use.png</iconset>
+           </property>
           </widget>
          </item>
         </layout>
@@ -69,6 +77,10 @@
         <property name="text">
          <string>Добавить фон</string>
         </property>
+        <property name="icon">
+         <iconset resource="res/res.qrc">
+          <normaloff>:/Icons/img-file.png</normaloff>:/Icons/img-file.png</iconset>
+        </property>
        </widget>
       </item>
      </layout>
@@ -77,6 +89,8 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="res/res.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -2,19 +2,22 @@ import csv
 import json
 import os
 
-from PyQt5 import uic, QtWidgets, QtCore
+from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt, QPointF
 from PyQt5.QtGui import QCursor, QPixmap, QFont, QColor, QImage, QPainter
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QTableWidgetItem, QGraphicsScene, QGraphicsPixmapItem, \
-    QGraphicsView, QGraphicsTextItem, QCommandLinkButton, QFormLayout, QHBoxLayout
+    QGraphicsView, QGraphicsTextItem
+
+from designs.export import Ui_MainWindow
 
 from common import const
 
 
-class ExportDialog(QMainWindow):
+class ExportDialog(QMainWindow, Ui_MainWindow):
     def __init__(self, parent, settings: str):
         super().__init__()
-        uic.loadUi('designs/export.ui', self)  # Загружаем дизайн
+        self.setupUi(self)
+
         self.parent = parent
         self.image_format = 4
         self.file = ''

@@ -1,4 +1,5 @@
 import json
+import os
 import shutil
 import uuid
 
@@ -76,8 +77,13 @@ class AddTemplateDialog(QMainWindow):
     def save(self):
         template_name = self.editName.text()
         if template_name:
-            bg = f'./templates/{uuid.uuid4()}.template'
-            shutil.copy2(self.bg, bg)
+            if self.template is None:
+                bg = f'./templates/{uuid.uuid4()}.template'
+                shutil.copy2(self.bg, bg)
+            else:
+                bg = self.template['settings']['bg']
+                if self.template['settings']['bg'] != self.bg:
+                    os.remove(self.template['settings']['bg'])
             data = {
                 'items': [],
                 'bg': bg,
@@ -151,3 +157,4 @@ class AddTemplateDialog(QMainWindow):
         self.parent.reload_templates()
         self.parent.useTemplate.setEnabled(False)
         self.parent.editTemplate.setEnabled(False)
+        self.parent.deleteTemplate.setEnabled(False)

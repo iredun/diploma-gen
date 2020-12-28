@@ -1,16 +1,16 @@
-from PyQt5 import uic  # Импортируем uic
 from PyQt5.QtCore import QRectF, Qt
 from PyQt5.QtGui import QPainter, QImage, QPixmap, QColor, QFont
 from PyQt5.QtWidgets import QMainWindow, QGraphicsRectItem, QGraphicsScene, QGraphicsPixmapItem, QGraphicsView, \
     QGraphicsTextItem, QColorDialog
 
+from designs.item_config import Ui_MainWindow
 from common import const
 
 
-class ItemConfigDialog(QMainWindow):
+class ItemConfigDialog(QMainWindow, Ui_MainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        uic.loadUi('designs/item_config.ui', self)  # Загружаем дизайн
+        self.setupUi(self)
 
         self.text_aligns = [
             ('center', 'По центру'),
