@@ -221,7 +221,7 @@ class Ui_MainWindow(object):
         self.labelFileName.setText(_translate("MainWindow", "Название файла"))
         self.labelDirPreview.setText(_translate("MainWindow", "Пример итогового пути"))
         self.labelFileExt.setText(_translate("MainWindow", ".png"))
-        self.startGen.setText(_translate("MainWindow", "Експорт"))
+        self.startGen.setText(_translate("MainWindow", "Экспорт"))
         self.prevPushButton.setText(_translate("MainWindow", "<- Назад"))
         self.nextPushButton.setText(_translate("MainWindow", "Далее ->"))
 
