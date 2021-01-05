@@ -8,6 +8,9 @@ from common import const
 
 
 class ItemConfigDialog(QMainWindow, Ui_MainWindow):
+    """
+    Окно настроек элемента
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)

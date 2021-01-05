@@ -58,6 +58,9 @@ class Main(QMainWindow, Ui_MainWindow):
         self.models.template_model.select()
 
     def change_item_selected(self):
+        """
+        Функция слежения за выбранным элементом в таблице
+        """
         rows = self.tableTemplates.selectionModel().selectedRows()
         if rows:
             for index in rows:

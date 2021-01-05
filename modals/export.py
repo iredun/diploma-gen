@@ -14,6 +14,9 @@ from common import const
 
 
 class ExportDialog(QMainWindow, Ui_MainWindow):
+    """
+    Окно экспорта
+    """
     def __init__(self, parent, settings: str):
         super().__init__()
         self.setupUi(self)

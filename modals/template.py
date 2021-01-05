@@ -5,18 +5,21 @@ import uuid
 
 from common import const
 
-from PyQt5 import uic  # Импортируем uic
 from PyQt5.QtCore import QVariant
 from PyQt5.QtGui import QPixmap, QCloseEvent
 from PyQt5.QtWidgets import QGraphicsScene, QFileDialog, QGraphicsPixmapItem, QMainWindow, QMessageBox
+from designs.add_template import Ui_MainWindow
 
 from common.graphics import GraphicsView
 
 
-class AddTemplateDialog(QMainWindow):
+class AddTemplateDialog(QMainWindow, Ui_MainWindow):
+    """
+    Окно создания/изменения шаблона
+    """
     def __init__(self, parent):
         super().__init__()
-        uic.loadUi('designs/add_template.ui', self)  # Загружаем дизайн
+        self.setupUi(self)
 
         self.parent = parent
         self.bg_item = None
@@ -78,7 +81,7 @@ class AddTemplateDialog(QMainWindow):
         template_name = self.editName.text()
         if template_name:
             if self.template is None:
-                bg = f'./templates/{uuid.uuid4()}.template'
+                bg = f'./templates/{uuid.uuid4()}.template'  # сохраняем файл шаблон в папку с другим разширением
                 shutil.copy2(self.bg, bg)
             else:
                 bg = self.template['settings']['bg']
@@ -89,6 +92,7 @@ class AddTemplateDialog(QMainWindow):
                 'bg': bg,
             }
             for item in self.scene.items():
+                # сохранение настроек элементов
                 if item.toolTip():
                     pos_from = self.graphicsView.mapFromScene(item.sceneBoundingRect())
                     pos = self.graphicsView.mapToScene(pos_from)
@@ -135,6 +139,9 @@ class AddTemplateDialog(QMainWindow):
             msg.exec_()
 
     def is_edit_mode(self):
+        """
+        Проверяем в каком режиме сейчас
+        """
         result = self.edit_mode and self.bg
         if result:
             self.statusbar.showMessage('Режим работы: Добавление')
